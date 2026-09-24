@@ -93,7 +93,7 @@
     }
     function addOptions(id, values) { values.forEach(value => { const option=document.createElement('option'); option.value=value; option.textContent=value; $(id).appendChild(option); }); }
     ['county','year','item','q'].forEach(id => $(id).addEventListener(id==='q'?'input':'change',render));
-    fetch('./api/v1/records.json').then(r => { if(!r.ok) throw Error(`HTTP ${r.status}`); return r.json(); }).then(data => {
+    fetch('./api/v1/records.json',{cache:'no-store'}).then(r => { if(!r.ok) throw Error(`HTTP ${r.status}`); return r.json(); }).then(data => {
       records=data.data;
       const counties=[...new Set(records.map(r=>r.county))].sort(), years=[...new Set(records.map(r=>r.year_roc))].sort(), items=[...new Set(records.map(r=>r.item))].sort();
       $('row-count').textContent=records.length; $('county-count').textContent=counties.length; $('year-count').textContent=years.length; $('item-count').textContent=items.length;
@@ -102,10 +102,11 @@
       render();
     }).catch(error => { $('result-count').textContent=`載入失敗：${error.message}`; });
     function renderDocs() { const base=$('api-base').value.trim().replace(/\/$/,''); const spec={...openapi,servers:base?[{url:base}]:[]}; window.ui=SwaggerUIBundle({spec,dom_id:'#swagger-ui',deepLinking:true,filter:true,displayRequestDuration:true}); }
-    fetch('./openapi.json').then(r=>r.json()).then(data=>{openapi=data;renderDocs();});
+    fetch('./openapi.json',{cache:'no-store'}).then(r=>r.json()).then(data=>{openapi=data;renderDocs();});
     $('connect-api').addEventListener('click',()=>{if(openapi)renderDocs();});
   </script>
 </body>
 </html>
+
 
 
