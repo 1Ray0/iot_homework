@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="新住民子女發展遲緩統計 CSV 開放資料查詢與 REST API 文件">
+  <title>新住民子女發展遲緩統計 API</title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css">
+  <style>
+    :root { font-family: system-ui, -apple-system, 'Noto Sans TC', sans-serif; color: #203241; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f5f7fa; }
+    header { background: #15374c; color: white; padding: 38px max(20px, calc((100vw - 1120px)/2)); }
+    h1 { margin: 0 0 8px; font-size: clamp(28px,4vw,42px); }
+    header p { margin: 0; color: #d4e6f2; }
+    main { max-width: 1120px; margin: auto; padding: 22px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 12px; margin: 0 0 20px; }
+    .card, section { background: white; border: 1px solid #dce4eb; border-radius: 12px; padding: 18px; }
+    .card strong { display: block; font-size: 27px; margin-top: 6px; color: #126276; }
+    section { margin-bottom: 18px; }
+    h2 { margin-top: 0; }
+    .muted { color: #536b78; }
+    .controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
+    .controls > div { flex: 1 1 170px; }
+    label { display: block; font-weight: 600; margin: 0 0 5px; }
+    input, select { font: inherit; width: 100%; padding: 10px; border: 1px solid #b9cbd5; border-radius: 7px; background: white; }
+    button { font: inherit; padding: 10px 18px; color: white; border: none; border-radius: 7px; background: #08738a; cursor: pointer; }
+    button:hover { background: #07596b; }
+    a { color: #075f77; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { text-align: left; padding: 11px 8px; border-bottom: 1px solid #e2e9ed; white-space: nowrap; }
+    th { background: #eef5f7; }
+    .notice { border-left: 4px solid #d68b1d; padding: 10px 14px; background: #fff8eb; }
+    #swagger-ui { margin-top: 20px; }
+    footer { max-width: 1120px; margin: auto; padding: 0 22px 30px; color: #536b78; }
+  </style>
+</head>
+<body>
+  <header><h1>新住民子女發展遲緩統計 API</h1><p>CSV 資料查詢、REST API 與可搜尋的互動文件</p></header>
+  <main>
+    <div class="cards">
+      <div class="card">資料列數<strong id="row-count">—</strong></div>
+      <div class="card">縣市數<strong id="county-count">—</strong></div>
+      <div class="card">年度數<strong id="year-count">—</strong></div>
+      <div class="card">項目數<strong id="item-count">—</strong></div>
+    </div>
+    <section>
+      <h2>動態查詢</h2>
+      <p class="muted">網頁直接讀取 GitHub Pages 上的最新建置快照，改動 CSV 並重新執行 Actions 後會更新。</p>
+      <div class="controls">
+        <div><label for="county">縣市</label><select id="county"><option value="">全部</option></select></div>
+        <div><label for="year">民國年度</label><select id="year"><option value="">全部</option></select></div>
+        <div><label for="item">項目</label><select id="item"><option value="">全部</option></select></div>
+        <div><label for="q">關鍵字</label><input id="q" placeholder="縣市或項目"></div>
+      </div>
+      <p id="result-count" aria-live="polite"></p>
+      <div class="table-wrap"><table><thead><tr><th>縣市</th><th>民國年度</th><th>項目</th><th>男性人數</th><th>女性人數</th><th>該項目合計</th></tr></thead><tbody id="records"></tbody></table></div>
+      <p id="updated" class="muted"></p>
+    </section>
+    <section>
+      <h2>按項目統計</h2>
+      <div class="table-wrap"><table><thead><tr><th>項目</th><th>男性人數</th><th>女性人數</th><th>該項目合計</th><th>男性占比</th><th>女性占比</th></tr></thead><tbody id="summary"></tbody></table></div>
+      <p class="notice">「通報數」與「個案管理數」為不同指標；各列男女人數可以合計，但不同項目不可直接相加當作不重複人數。</p>
+    </section>
+    <section>
+      <h2>公開 JSON 與文件</h2>
+      <p><a href="./api/v1/records.json">資料快照</a> · <a href="./api/v1/summary.json">分項統計</a> · <a href="./api/v1/facets.json">篩選選項</a> · <a href="./openapi.json">OpenAPI JSON</a></p>
+      <p class="muted">GitHub Pages 提供唯讀快照。POST 與即時查詢需要部署下方 OpenAPI 描述的 FastAPI 服務；GitHub Actions 無法持續執行伺服器。</p>
+    </section>
+    <section>
+      <h2>REST API 互動文件</h2>
+      <p class="muted">可依路徑或欄位搜尋 API。若已部署服務，輸入 HTTPS 網址後可直接使用 Try it out 測試 GET/POST。</p>
+      <div class="controls"><div><label for="api-base">API 服務網址</label><input id="api-base" type="url" placeholder="https://your-api.example.com"></div><button id="connect-api" type="button">連接 API</button></div>
+      <div id="swagger-ui"></div>
+    </section>
+  </main>
+  <footer>資料來源：使用者提供的「114新住民子女發展遲緩.csv」。本站僅呈現彙總資料。</footer>
+  <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+  <script>
+    const $ = id => document.getElementById(id);
+    let records = [], openapi;
+    function td(value) { const cell = document.createElement('td'); cell.textContent = value; return cell; }
+    function fillTable(id, rows) { $(id).replaceChildren(...rows.map(values => { const row = document.createElement('tr'); values.forEach(value => row.appendChild(td(value))); return row; })); }
+    function render() {
+      const county = $('county').value, year = $('year').value, item = $('item').value, q = $('q').value.trim().toLocaleLowerCase();
+      const selected = records.filter(r => (!county || r.county === county) && (!year || String(r.year_roc) === year) && (!item || r.item === item) && (!q || `${r.county} ${r.item}`.toLocaleLowerCase().includes(q)));
+      $('result-count').textContent = `符合 ${selected.length} 筆`;
+      fillTable('records', selected.map(r => [r.county, r.year_roc, r.item, r.male_count, r.female_count, r.total_count]));
+      const groups = new Map();
+      selected.forEach(r => { const g = groups.get(r.item) || {male:0,female:0}; g.male += r.male_count; g.female += r.female_count; groups.set(r.item,g); });
+      fillTable('summary', [...groups].sort(([a],[b]) => a.localeCompare(b,'zh-Hant')).map(([name,g]) => { const total=g.male+g.female; return [name,g.male,g.female,total,total ? `${(g.male/total*100).toFixed(1)}%`:'—',total ? `${(g.female/total*100).toFixed(1)}%`:'—']; }));
+    }
+    function addOptions(id, values) { values.forEach(value => { const option=document.createElement('option'); option.value=value; option.textContent=value; $(id).appendChild(option); }); }
+    ['county','year','item','q'].forEach(id => $(id).addEventListener(id==='q'?'input':'change',render));
+    fetch('./api/v1/records.json').then(r => { if(!r.ok) throw Error(`HTTP ${r.status}`); return r.json(); }).then(data => {
+      records=data.data;
+      const counties=[...new Set(records.map(r=>r.county))].sort(), years=[...new Set(records.map(r=>r.year_roc))].sort(), items=[...new Set(records.map(r=>r.item))].sort();
+      $('row-count').textContent=records.length; $('county-count').textContent=counties.length; $('year-count').textContent=years.length; $('item-count').textContent=items.length;
+      addOptions('county',counties); addOptions('year',years); addOptions('item',items);
+      $('updated').textContent=`資料檔更新時間：${new Date(data.data_updated_at).toLocaleString('zh-TW',{timeZone:'Asia/Taipei'})}`;
+      render();
+    }).catch(error => { $('result-count').textContent=`載入失敗：${error.message}`; });
+    function renderDocs() { const base=$('api-base').value.trim().replace(/\/$/,''); const spec={...openapi,servers:base?[{url:base}]:[]}; window.ui=SwaggerUIBundle({spec,dom_id:'#swagger-ui',deepLinking:true,filter:true,displayRequestDuration:true}); }
+    fetch('./openapi.json').then(r=>r.json()).then(data=>{openapi=data;renderDocs();});
+    $('connect-api').addEventListener('click',()=>{if(openapi)renderDocs();});
+  </script>
+</body>
+</html>
+
