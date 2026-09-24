@@ -98,7 +98,7 @@
       const counties=[...new Set(records.map(r=>r.county))].sort(), years=[...new Set(records.map(r=>r.year_roc))].sort(), items=[...new Set(records.map(r=>r.item))].sort();
       $('row-count').textContent=records.length; $('county-count').textContent=counties.length; $('year-count').textContent=years.length; $('item-count').textContent=items.length;
       addOptions('county',counties); addOptions('year',years); addOptions('item',items);
-      $('updated').textContent=`資料檔更新時間：${new Date(data.data_updated_at).toLocaleString('zh-TW',{timeZone:'Asia/Taipei'})}`;
+      $('updated').textContent=`網頁資料建置時間：${new Date(data.generated_at).toLocaleString('zh-TW',{timeZone:'Asia/Taipei'})}`;
       render();
     }).catch(error => { $('result-count').textContent=`載入失敗：${error.message}`; });
     function renderDocs() { const base=$('api-base').value.trim().replace(/\/$/,''); const spec={...openapi,servers:base?[{url:base}]:[]}; window.ui=SwaggerUIBundle({spec,dom_id:'#swagger-ui',deepLinking:true,filter:true,displayRequestDuration:true}); }
@@ -107,4 +107,5 @@
   </script>
 </body>
 </html>
+
 

@@ -2,7 +2,7 @@
 
 以 `data/source.csv` 為資料來源的公開查詢專案。提供 FastAPI REST API、OpenAPI／Swagger 互動文件，以及由 GitHub Actions 發布到 GitHub Pages 的可查詢網頁和 JSON 快照。
 
-**公開網頁：** https://1ray0.github.io/iot_homework/ （須在 repository 的 Settings → Pages 將來源設為 **GitHub Actions**，首次部署完成後生效）  
+**公開網頁：** https://1ray0.github.io/iot_homework/  
 **原始碼：** https://github.com/1Ray0/iot_homework
 
 ## 資料範圍與解讀
@@ -105,4 +105,5 @@ python scripts/build_site.py
 ## 授權
 
 程式碼採 MIT License。`data/source.csv` 由使用者提供，原始資料授權未附；引用或再利用資料時請另確認來源授權。
+
 
